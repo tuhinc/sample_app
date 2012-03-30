@@ -2,37 +2,51 @@ require 'spec_helper'
 
 describe User do
   
+  #create a valid user
+  
   before do
     @user = User.new(name: "Example User", email: "user@example.com", 
                       password: "foobar", password_confirmation: "foobar")  
   end
   
+  #make sure the following tests have our new user as their subject
   subject { @user }
   
+  #check that you can run the following methods on @user
   it { should respond_to(:name) }
   it { should respond_to(:email) }
   it { should respond_to(:password_digest) }
   it { should respond_to(:password) }
   it { should respond_to(:password_confirmation) }
+  it { should respond_to(:remember_token)}
   it { should respond_to(:authenticate) }
   
+  #sanity-check => check that the user is valid
   it { should be_valid }
   
+  #create an instance of the user that should violate validity
+  #then make sure the user model finds it invalid
   describe "when name is not present" do
     before { @user.name = " " }
     it { should_not be_valid }
   end
   
+  #create an instance of the user that should violate validity
+  #then make sure the user model finds it invalid
   describe "when email is not present" do
     before { @user.email = " " }
     it { should_not be_valid }
   end
   
+  #create an instance of the user that should violate validity
+  #then make sure the user model finds it invalid
   describe "when name is way too long" do
     before { @user.name = "a" * 51 }
     it { should_not be_valid }
   end
   
+  #create an instance of a user with invalid email
+  #then make sure the user model finds it invalid
   describe "when email format is invalid" do
     invalid_addresses = %w[user@foo,com user_at_foo.org t@t.t example.user@foo]
     invalid_addresses.each do |invalid_address|
@@ -41,6 +55,8 @@ describe User do
     end
   end
   
+  #create an instance of a user with valid email
+  #then make sure the user model finds it valid
   describe "when email format is valid" do
     valid_addresses = %w[tuhin@gmail.com A_T@tuh.three.org first.last@zn.cn]
     valid_addresses.each do |valid_address|
@@ -49,6 +65,9 @@ describe User do
     end
   end
   
+  #create a user with the same email address as @user
+  #make it uppercase to ensure case sensitivity is not an issue
+  #save the new user and make sure it is not valid
   describe "when email address is already def taken" do
     before do
       user_with_same_email = @user.dup
@@ -93,5 +112,10 @@ describe User do
   describe "with a password that's too short" do
     before { @user.password = @user.password_confirmation = "a" * 5 }
     it { should be_invalid }
+  end
+  
+  describe "remember token" do
+    before { @user.save }
+    its(:remember_token) { should_not be_blank }
   end
 end
