@@ -20,9 +20,17 @@ describe User do
   it { should respond_to(:password_confirmation) }
   it { should respond_to(:remember_token)}
   it { should respond_to(:authenticate) }
+  it { should respond_to(:admin) }
   
   #sanity-check => check that the user is valid
   it { should be_valid }
+  it { should_not be_admin }
+  
+  describe "with admin attribute set to 'true'" do
+    before { @user.toggle!(:admin) }
+    
+    it { should be_admin }
+  end
   
   #create an instance of the user that should violate validity
   #then make sure the user model finds it invalid
